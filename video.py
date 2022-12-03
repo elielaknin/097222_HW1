@@ -46,11 +46,11 @@ def video(model_path, video_path, video_label_path):
     if (capture.isOpened() == False):
         print("Error opening video stream or file")
 
-    history_queue_left = []
-    history_queue_right = []
+    history_label_left, history_bbox_left = [], []
+    history_label_right, history_bbox_right = [], []
 
-    # for frameNr in tqdm(range(number_of_frames_in_video)):
-    for frameNr in tqdm(range(500)):
+    for frameNr in tqdm(range(number_of_frames_in_video)):
+    # for frameNr in tqdm(range(500)):
 
         success, frame = capture.read()
         if success:
@@ -61,11 +61,11 @@ def video(model_path, video_path, video_label_path):
             predicted_frame = frame
 
             left_tools_df = predicted_df[predicted_df['class'] % 2 == 1]
-            if not left_tools_df.empty:
 
-                # option B
-                left_bbox, left_label = smooth_confidence_function(left_tools_df, history_queue_left)
+            # option B
+            left_bbox, left_label = smooth_confidence_function(left_tools_df, history_label_left, history_bbox_left)
 
+            # if not left_tools_df.empty:
                 # if len(left_tools_df) > 1:
                 #     # if prediction of the tool is not sure (2 or more) use history to decide
                 #     # also if the modl detect 2 or more bbox for the tool, then average the bbox points
@@ -74,17 +74,19 @@ def video(model_path, video_path, video_label_path):
                 #     left_bbox = list(left_tools_df[['xmin', 'ymin', 'xmax', 'ymax']].astype('int').iloc[0])
                 #     left_label = left_tools_df['name'].iloc[0]
 
-                history_queue_left.append(left_label)
-                predicted_frame = bbv.draw_rectangle(predicted_frame, left_bbox, bbox_color=BLUE_COLOR)
-                predicted_frame = bbv.add_label(predicted_frame, left_label, left_bbox, top=True, text_bg_color=BLUE_COLOR)
+            history_label_left.append(left_label)
+            history_bbox_left.append(left_bbox)
+
+            predicted_frame = bbv.draw_rectangle(predicted_frame, left_bbox, bbox_color=BLUE_COLOR)
+            predicted_frame = bbv.add_label(predicted_frame, left_label, left_bbox, top=True, text_bg_color=BLUE_COLOR)
 
 
             right_tools_df = predicted_df[predicted_df['class'] % 2 == 0]
-            if not right_tools_df.empty:
 
-                # option B
-                right_bbox, right_label = smooth_confidence_function(right_tools_df, history_queue_right)
+            # option B
+            right_bbox, right_label = smooth_confidence_function(right_tools_df, history_label_right, history_bbox_right)
 
+            # if not right_tools_df.empty:
                 # if len(right_tools_df) > 1:
                 #     # if prediction of the tool is not sure (2 or more) use history to decide
                 #     # also if the modl detect 2 or more bbox for the tool, then average the bbox points
@@ -93,9 +95,11 @@ def video(model_path, video_path, video_label_path):
                 #     right_bbox = list(right_tools_df[['xmin', 'ymin', 'xmax', 'ymax']].astype('int').iloc[0])
                 #     right_label = right_tools_df['name'].iloc[0]
 
-                history_queue_right.append(right_label)
-                predicted_frame = bbv.draw_rectangle(predicted_frame, right_bbox, bbox_color=RED_COLOR)
-                predicted_frame = bbv.add_label(predicted_frame, right_label, right_bbox, top=True, text_bg_color=RED_COLOR)
+            history_label_right.append(right_label)
+            history_bbox_right.append(right_bbox)
+
+            predicted_frame = bbv.draw_rectangle(predicted_frame, right_bbox, bbox_color=RED_COLOR)
+            predicted_frame = bbv.add_label(predicted_frame, right_label, right_bbox, top=True, text_bg_color=RED_COLOR)
 
             # if label exist calculat stats
             if video_label_path:
