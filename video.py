@@ -12,7 +12,23 @@ from utils_functions import get_video_stats, get_video_time_label ,get_gt_label,
 BLUE_COLOR = (225, 224, 145)
 RED_COLOR = (60, 20, 220)
 
+"""Predict video with bounding box and class.
 
+Using video and video time label. Split the video to frames and predict each frame
+Using yolo v5 model path. Then create new frame with GT and predicited bbox and label.
+Create new video based on annoted frames and return statistic of the video (CM, recall, precision, f1-score).
+
+Parameters
+----------
+model_path : yolo v5 ".pt" file path
+video_path : path of the video
+video_label_path: location of the video label (tool_usage)
+
+Return
+------
+None
+
+"""
 def video(model_path, video_path, video_label_path):
 
     # Load model
