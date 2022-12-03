@@ -78,15 +78,22 @@ def get_gt_label(full_hand_label_dict, frameNr):
     return right_name_gt, left_name_gt
 
 
-def smooth_confidence_function(tools_df, history_queue):
-    # check if confidence is less than 80
-    # if yes take the last frame label
+def smooth_confidence_function(tools_df, history_label, history_bbox):
+    # use history previous bbox and label if one condition exist:
+    #   - detection df is empty
+    #   - detection df has more than one object detection
+    #   - detection confidence is less than 75
+
+    if len(tools_df) != 1:
+        bbox = history_bbox[-1:][0]
+        label = history_label[-1:][0]
+        return bbox, label
 
     tools_sorted_df = tools_df.sort_values(by=['confidence'], ascending=False)
-    if tools_sorted_df['confidence'].iloc[0] < 0.8:
-        # take from last frame
-        label = mode(history_queue[-1:])[0]
-        bbox = list(tools_sorted_df[['xmin', 'ymin', 'xmax', 'ymax']].astype('int').iloc[0])
+    if tools_sorted_df['confidence'].iloc[0] < 0.75:
+        # take info from previous frame
+        bbox = history_bbox[-1:][0]
+        label = history_label[-1:][0]
     else:
         label = tools_sorted_df['name'].iloc[0]
         bbox = list(tools_sorted_df[['xmin', 'ymin', 'xmax', 'ymax']].astype('int').iloc[0])
@@ -95,7 +102,6 @@ def smooth_confidence_function(tools_df, history_queue):
 
 
 def smooth_function(tools_df, history_queue):
-
     #check number of labels in df
     number_of_labels = len(np.unique(tools_df['name']))
 
