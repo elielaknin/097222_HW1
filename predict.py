@@ -3,7 +3,22 @@ import os
 import argparse
 import torch
 
+"""Predict bounding box and class of one image.
 
+Using yolo v5 model path and path of an images.
+We analyze the image and return the bbox and label prediction
+
+Parameters
+----------
+model_path : yolo v5 ".pt" file path
+images_folder : folder path of the images
+output_path: Where to save the images prediction
+
+Return
+------
+None
+
+"""
 def predict_function(model_path, image_path):
 
     # Model
