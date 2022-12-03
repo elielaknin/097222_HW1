@@ -3,45 +3,43 @@ import pandas as pd
 import os
 import json
 import matplotlib.pyplot as plt
+import shutil
 
 
-def get_statistics_bboxes():
-    bboxes_labels_folder_path = 'data/images/bboxes_labels'
-    classes_names_file_path = 'data/images/classes.names'
+def split_images_dataset():
+    dataset_folder_path = 'data/images/'
+    output_dataset_path = 'dataset/images'
 
-    classes_names_dict = get_classes_dict(classes_names_file_path)
 
-    histogram_arr = np.zeros(8)
-    for txt_file in os.listdir(bboxes_labels_folder_path):
-        with open(os.path.join(bboxes_labels_folder_path, txt_file)) as f:
-            for line in f:
-                class_number = line.split(' ')[0]
-                histogram_arr[int(class_number)] += 1
+    for txt_file, dst_folder_name in [('train.txt', 'train'), ('valid.txt', 'val'), ('test.txt', 'test')]:
+        dst_folder = os.path.join(output_dataset_path, dst_folder_name)
+        os.makedirs(dst_folder, exist_ok=True)
+        with open(os.path.join(dataset_folder_path, txt_file)) as f:
+            for image_name in f:
+                src_image = os.path.join(dataset_folder_path, 'images', image_name.split('\n')[0])
+                shutil.copy2(src_image, dst_folder)
         f.close()
 
-    plt.figure(figsize=(12, 12))
-    plt.bar(list(classes_names_dict.values()), histogram_arr, color=['cadetblue'])
-    plt.xticks(rotation=45)
-    plt.ylabel('Frequency appearance of data', fontsize=12)
-    plt.title('Histogram of bounding box labels', fontsize=18)
-    plt.show()
-    print('a')
 
+def split_labels_dataset():
+    dataset_folder_path = 'data/images/'
+    output_dataset_path = 'dataset/labels'
 
-def get_classes_dict(classes_names_file_path):
-    classes_names_dict = {}
-    with open(classes_names_file_path) as f:
-        idx = 0
-        for line in f:
-            classes_names_dict[idx] = line.split('\n')[0]
-            idx += 1
-    f.close()
+    for txt_file, dst_folder_name in [('train.txt', 'train'), ('valid.txt', 'val'), ('test.txt', 'test')]:
+        dst_folder = os.path.join(output_dataset_path, dst_folder_name)
+        os.makedirs(dst_folder, exist_ok=True)
+        with open(os.path.join(dataset_folder_path, txt_file)) as f:
+            for image_name in f:
+                src_label = os.path.join(dataset_folder_path, 'bboxes_labels', image_name.split('.jpg')[0])
+                src_label += '.txt'
+                shutil.copy2(src_label, dst_folder)
+        f.close()
 
-    return classes_names_dict
 
 
 def main():
-    get_statistics_bboxes()
+    split_labels_dataset()
+    # split_images_dataset()
 
 
 if __name__ == '__main__':
