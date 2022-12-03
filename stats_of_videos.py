@@ -1,6 +1,6 @@
 import pandas as pd
 import argparse
-from video import get_video_stats
+from utils_functions import get_video_stats
 
 
 def main():
