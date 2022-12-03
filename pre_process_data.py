@@ -5,7 +5,11 @@ import json
 import matplotlib.pyplot as plt
 import shutil
 
+"""
 
+Split the data into 3 folder - train, val and test
+using txt files with the splits 
+"""
 def split_images_dataset():
     dataset_folder_path = 'data/images/'
     output_dataset_path = 'dataset/images'
@@ -39,7 +43,7 @@ def split_labels_dataset():
 
 def main():
     split_labels_dataset()
-    # split_images_dataset()
+    split_images_dataset()
 
 
 if __name__ == '__main__':
